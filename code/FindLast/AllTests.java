@@ -21,4 +21,3 @@ public class AllTests
        return new JUnit4TestAdapter (AllTests.class);
     }
 }
-
