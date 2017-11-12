@@ -1,0 +1,181 @@
+TESTING
+-------
+
+FAULT --> Línea de código bug (código incorrecto en alguno de los casos que tenemos de requisito)
+
+ERROR --> Fault es la causa de un error. Estado (variables internas del programa) erróneo en el código en alguna supuesta ejecucion/prueba.
+
+FAILURE --> Un error puede probar un failure(que podemos o no detectar con nuestras pruebas). Disfunción.
+            Comportamiento externo que debería tener el programa según requisitos.
+            Cuando ejecutamos una prueba de nuestro código y vemos un error en el método.
+
+(PROGRAM STATE --> EL VALOR CONCRETO DE TODAS LAS VARIABLES EN SU LOCALIZACIÓN ACTUAL DURANTE UNA EJECUCIÓN)
+(STATE PROGRAM --> ERROR NO ESPERADO EN UNA VARIABLE, AUNQUE POR CASUALIDAD ESA VARIABLE NO PROPAGUE EL ERROR A
+                   LA SALIDA DEL PROGRAMA Y SIGA SIENDO CORRECTA, ES UN ERROR DE ESTADO)
+
+----------
+EJERCICIOS
+
+FINDLAST
+
+1. El fallo se encuentra en la condición de iteración del bucle for de la método findLast, donde nunca entrará
+   en el elemento con el index = 0. Con esto supongo que si el número que introducimos no se encuentra en el
+   array deberá devolver un -1, que es lo que hace en un principio.
+   MODIFICACIÓN ---> Original: LINEA 16 for (int i=x.length-1; i > 0; i--)
+                     Nueva: LINEA 16 for (int i=x.length-1; i > -1; i--)
+
+2. NO existe un caso de prueba donde no se ejecute el fallo que hay en el código, puesto que el fallo se
+   encuentra en el método que recorre el array que nosotros introducimos previamente, y esto lo va a hacer
+   el programa todas las veces que lo ejecutemos.
+
+3. Un caso de prueba donde se ejecuta el fallo que hay en el código pero no provoca error de estado,
+   sería el siguiente:
+
+    int arr[] = {2, 3, 5};
+    int y = 5;
+    assertEquals("Last occurence in first element", 0, FindLast.findLast(arr, y));
+
+   Donde la última aparición del elemento buscado no esta en el index = 0 del array y, por tanto, no va provocar
+   un error de estado en las variables.
+
+(2. y 3. resultan en un error, pero solo 2. resulta en un failure)
+
+4. Un caso de prueba donde se provoque un error de estado, pero que no acaba provocando una disfunción en el
+   comportamiento del programa sería el siguiente:
+
+   int arr[] = {2, 3, 5};
+   int y = 4;
+   assertEquals("Last occurence in first element", 0, FindLast.findLast(arr, y));
+
+   Va a provocar un error de estado puesto que la variable que itera (i) no llega a comprobar la primera posición
+   del array en ningún momento, aunque esto no se refleje en una disfunción del programa dado que no tenemos
+   el número que buscamos en el array y devolverá -1.
+
+5. Para la prueba anterior, el primero de los estados erróneos se produce cuando la variable de iteración i
+   toma el valor 0 y no vuelve a entrar en el for, dejándonos un valor en el array sin comprobar. También produce
+   un estado de error en el PC del programa puesto que este debería seguir en el for, pero al tener nuestro
+   código el fault comentado en el apartado 1, el PC no vuelve a apuntar al for aunque debería hacerlo hasta
+   terminar de iterar en todos los index del array.
+
+6. LINEA 16 for (int i=x.length-1; i > -1; i--)
+java -cp .:../junit-4.12.jar:../hamcrest-core-1.3.jar AllTests
+.
+Time: 0,057
+
+OK (1 test)
+
+
+LASTZERO
+
+1. El fallo se encuentra en que si encontramos un 0 en el array que le pasamos sale del for, y este bucle
+   empieza por el principio del array, por tanto, si encontramos un 0 en el index = 1 de dicho array y tenemos
+   otro 0 en el index = 5 del mismo array, la salida será 1 provocando un failure y disfunción del programa.
+   MODIFICACION: recorrer el array desde el index más alto al más bajo haciendo decrecer la variable con la
+                 que iteramos (i-- por ejemplo)
+
+2. NO existe un caso de prueba donde no se ejecute el fallo que hay en el código, puesto que el fallo se
+   encuentra en el método que recorre el array que nosotros introducimos previamente, y esto lo va a hacer
+   el programa todas las veces que lo ejecutemos. Podríamos considerar una entrada válida la de ejecutar el programa
+   sin argumentos dado que no ejecuta el método dónde se encuentra el fault.
+
+3. Un caso de prueba donde se ejecuta el fallo que hay en el código pero no provoca error de estado,
+   sería el siguiente:
+
+      @Test public void multipleZeroes()
+       {
+          int arr[] = {0, 1, 2};
+          assertEquals("Multiple zeroes: should find last one", 2, LastZero.lastZero(arr));
+       }
+
+   Donde el único cero del array seria el primero y, por tanto, no tendríamos problema con un error de estado
+   puesto que las variables tienen un valor correcto.
+
+4. No es posible proporcionar un caso de prueba que provoque un error de estado y que no provoque una disfunción
+   en el comportamiento del programa, puesto que si metemos mas de un 0 en el array provocara una disfunción y
+   si metemos un 0 o ninguno, no provocará un error de estado ni una disfunción del programa.
+
+5. No podemos.
+
+6. for (int i = x.length-1; i >= 0; i--)
+java -cp .:../junit-4.12.jar:../hamcrest-core-1.3.jar AllTests
+.
+Time: 0,032
+
+OK (1 test)
+
+COUNTPOSITIVE
+
+1. El error en el código esta en que considera el 0 como numero positivo, por tanto, solucionando este problema
+   ya tenemos el código perfecto.
+   MODIFICACIÓN: considerar los números positivos solo los mayores estrictos que 0.
+
+2. NO existe un caso de prueba donde no se ejecute el fallo que hay en el código, puesto que el fallo se
+   encuentra en el método que recorre el array que nosotros introducimos previamente, y esto lo va a hacer
+   el programa todas las veces que lo ejecutemos. Podríamos considerar una entrada válida la de ejecutar el programa
+   sin argumentos dado que no ejecuta el método dónde se encuentra el fault.
+
+3. Un caso de prueba donde se ejecuta el fallo que hay en el código pero no provoca un error de estado,
+   seria el siguiente:
+
+   @Test public void arrayContainsZeroes()
+   {
+      int arr[] = {-4, 2, 2};
+      assertEquals("Array contains zeroes", 2, CountPositive.countPositive(arr));
+   }
+
+4. No es posible una prueba donde provoquemos un error de estado en alguna de las variables y esto no se refleje
+   en una disfución del programa.
+
+5. No podemos.
+
+6. if (x[i] > 0)
+   {
+     count++;
+   }
+
+java -cp .:../junit-4.12.jar:../hamcrest-core-1.3.jar AllTests
+.
+Time: 0,028
+
+OK (1 test)
+
+ODDORPOS
+
+1. El error en el código esta en que para ver los que son impares hacemos el modulo (división y nos quedamos
+   con el resto) pero si son impares negativos no los tiene en cuenta puesto que el resto de hacer la división
+   por 2 es -1 si son impares y 1 si son pares.
+   MODIFICACIÓN: tenemos que cambiar el código para que también tenga en cuenta los impares negativos.
+
+2. NO existe un caso de prueba donde no se ejecute el fallo que hay en el código, puesto que el fallo se
+   encuentra en el método que recorre el array que nosotros introducimos previamente, y esto lo va a hacer
+   el programa todas las veces que lo ejecutemos. Podríamos considerar una entrada válida la de ejecutar el programa
+   sin argumentos dado que no ejecuta el método dónde se encuentra el fault.
+
+3. Un caso de prueba donde se ejecuta el fallo que hay en el código pero no provoca un error de estado,
+   seria el siguiente:
+
+   @Test public void negativeOddNumbers()
+   {
+      int arr[] = {0, 1, 4};
+      assertEquals("Negative odd numbers in array", 2, OddOrPos.oddOrPos(arr));
+   }
+
+4. No es posible una prueba donde provoquemos un error de estado en alguna de las variables y esto no se refleje
+   en una disfución del programa.
+
+5. No podemos.
+
+6.  if (x[i]%2 == -1 || x[i] > 0)
+    {
+      count++;
+    }
+
+java -cp .:../junit-4.12.jar:../hamcrest-core-1.3.jar AllTests
+.
+Time: 0,03
+
+OK (1 test)
+
+
+    PODEMOS SOLO MODIFICAR EL RESTO PARA OBTENER LOS IMPARES NEGATIVOS PUESTO QUE LOS NUMEROS POSITIVOS LOS
+    CONTAMOS SIEMPRE SEAN O NO IMPARES.
